@@ -14,8 +14,8 @@
           </template>
         </q-input>
 
-        <router-link to="/">
-          <q-btn @click="popUp" icon="add" color="primary">Novo Cliente</q-btn>
+        <router-link to="/clientes/form">
+          <q-btn icon="add" color="primary" >Novo Cliente</q-btn>
         </router-link>
       </template>
 
@@ -26,13 +26,18 @@
           </q-td>
 
           <q-td auto-width>
-            <q-btn @click="editarCliente(props)" icon="edit" class="q-mr-xs" />
-            <q-btn @click="excluirCliente(props)" icon="delete" class="q-mr-xs" />
+            <router-link :to="{ path: '/clientes/form' }"
+          >
+              <q-btn @click="editarCliente(props)" icon="edit" class="q-mr-xs" /> 
+            </router-link>
+            <q-btn @click="excluirCliente(props)"  icon="delete" class="q-mr-xs" />
             <q-btn @click="exibirMaisInformacoes(props)"  icon="info" />
           </q-td>
         </q-tr>
       </template>
     </q-table>
+    <DialogConfirmDelete v-model="showConfirm"  @confirmar="confirmarExclusao"></DialogConfirmDelete>
+    <DialogDetalhesCliente v-model="showDetalhes" :data="clienteSelecionado"></DialogDetalhesCliente>
   </div>
 </template>
 
@@ -40,6 +45,8 @@
 import { ref, onMounted, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from '../boot/axios';
+import DialogDetalhesCliente from './DialogDetalhesCliente.vue';
+import DialogConfirmDelete from './DialogConfirmDelete.vue';
 
 const $q = useQuasar();
 const dadosApi = ref([]);
@@ -50,21 +57,28 @@ const columns = [
   { name: 'telefone', align: 'center', label: 'Telefone', field: 'telefone' },
   { name: 'cep', align: 'center', label: 'Cep', field: 'cep' }
 ];
-
 const search = ref('');
-
 const visibleColumns = ref(['nome', 'email', 'telefone', 'cep', 'sobrenome']);
+const showDetalhes = ref(false);
+const showConfirm = ref(false);
+const clienteSelecionado = ref(null);
+let idCliente;
 
-const popUp = () => {
-  // Lógica para mostrar o popup
+
+const editarCliente = async (cliente) => {
+  const idCliente = cliente.row.id
+  
+  try {
+    const response = await api.get("/clientes/" + idCliente)
+    
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+  
 };
 
-const editarCliente = (cliente) => {
-  // Lógica para editar o cliente
-  console.log('Editar:', cliente);
-};
-
-const getPosts = async () => {
+const getClientes = async () => {
   try {
     const  response  = await api.get('/clientes');
     dadosApi.value = response.data
@@ -74,34 +88,51 @@ const getPosts = async () => {
 };
 
 const excluirCliente = async (cliente) => {
-  const idDoCliente = cliente.row.id;
-  const nomeDoClienteExcluido = cliente.row.nome;
-  try {
-    const response = await api.delete('/clientes/' + idDoCliente)
-    console.log(response);
-    getPosts();
-    $q.notify({
-      color: 'green-4',
-      textColor: 'white',
-      icon: 'cloud_done',
-      message: `Cliente Id: ${idDoCliente} - Nome: ${nomeDoClienteExcluido} foi xcluido com sucesso!`
+  idCliente = cliente.row.id;
+  clienteSelecionado.value = cliente.row;
+  showConfirm.value = true;
+};
+
+const confirmarExclusao = async (opcao) => {
+  if (opcao === 'excluir') {
+    try {
+      await api.delete('/clientes/' + idCliente);
       
-    });
-  } catch (error) {
-    console.log('Erro:', error);
-  }
-  
+      getClientes();
+      $q.notify({
+        color: 'green-4',
+        textColor: 'white',
+        icon: 'cloud_done',
+        message: `Cliente foi excluído com sucesso!`
+      });
+    } catch (error) {
+      
+      $q.notify({
+        color: 'red-4',
+        textColor: 'white',
+        icon: 'cloud_done',
+        message: `Erro ao exlcuir! Erro: ${error}`
+      });
+
+    }
+  } 
 };
 
 
-const exibirMaisInformacoes = (cliente) => {
-  const idDoCliente = cliente.row.id;
-  console.log( idDoCliente );
+const exibirMaisInformacoes = async (cliente) => {
+  try {
+    const response = await api.get('/clientes/' + cliente.row.id);
+    
+    clienteSelecionado.value = response.data;
+    showDetalhes.value = true;
+  } catch (error) {
+    console.log('Erro:', error);
+  }
 };
 
 const buscarCliente = async () => {
   try {
-    const response = await api.get('/clientes/buscarnome/' + search.value)
+    const response = await api.get('/clientes/buscarnome?nome=' + search.value)
     dadosApi.value = response.data
   } catch (error) {
     console.log('Erro:', error);
@@ -109,10 +140,9 @@ const buscarCliente = async () => {
 };
 
 onMounted(() => {
-  getPosts();
+  getClientes();
 });
 
-// Assista às mudanças na variável search e chame buscarCliente em resposta
 watch(search, () => {
   buscarCliente();
 });

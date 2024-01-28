@@ -9,11 +9,7 @@
     </q-header>
 
     <q-page-container>
-      <router-link to="/" exact>
-        <q-btn>Home</q-btn>
-      </router-link>
-      
-      <router-link to="/clientes">
+      <router-link to="/clientes/list" exact>
         <q-btn>Clientes</q-btn>
       </router-link>
     </q-page-container>

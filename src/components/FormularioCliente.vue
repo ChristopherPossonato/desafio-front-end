@@ -1,57 +1,64 @@
 <template>
-  <div class="q-pa-md" style="max-width: 400px">
+  <div class="q-pa-md">
     <q-form
       @submit="onSubmit"
-      class="q-gutter-md"
-      style="margin: auto"
     >
-      <q-input
-        filled
-        v-model="nome"
-        label="Seu nome *"
-        hint="Nome"
-        lazy-rules
-        :rules="[val => val && val.length > 0 || 'Por favor digite seu nome']"
-      />
-
-      <q-input
-        filled
-        v-model="sobrenome"
-        label="Seu sobrenome *"
-        lazy-rules
-        :rules="[
-          val => val !== null && val !== '' || 'Por favor digite seu sobrenome'
-        ]"
-      />
-
-      <q-input
-        filled
-        v-model="email"
-        label="Seu email *"
-        lazy-rules
-        :rules="[
-          val => val !== null && val !== '' || 'Por favor digite um email válido'
-        ]"
-      />
-
-      <q-input
-        filled
-        v-model="telefone"
-        label="Seu telefone *"
-        lazy-rules
-        :rules="[
-          val => val !== null && val !== '' || 'Por favor digite seu telefone'
-        ]"
-      />
-      <q-input
-        filled
-        v-model="cep"
-        label="Seu CEP *"
-        lazy-rules
-        :rules="[
-          val => val !== null && val !== '' || 'Por favor digite seu CEP '
-        ]"
-      />
+      <div class="row">
+        <div class="col-6 q-mb-md">
+          <q-input
+            filled
+            v-model="nome"
+            label="Seu nome *"
+            hint="Nome"
+            lazy-rules
+            :rules="[val => val && val.length > 0 || 'Por favor digite seu nome']"
+          />
+        </div>
+        <div class="col-6 q-pl-xs q-mb-md">
+          <q-input
+            filled
+            v-model="sobrenome"
+            label="Seu sobrenome *"
+            lazy-rules
+            :rules="[
+              val => val !== null && val !== '' || 'Por favor digite seu sobrenome'
+            ]"
+          />
+        </div>
+        <div class="col-6 q-mb-md">
+          <q-input
+            filled
+            v-model="email"
+            label="Seu email *"
+            lazy-rules
+            :rules="[
+              val => val !== null && val !== '' || 'Por favor digite um email válido'
+            ]"
+          />
+        </div>
+        <div class="col-3 q-pl-xs q-mb-md">
+          <q-input
+            filled
+            v-model="telefone"
+            label="Seu telefone *"
+            lazy-rules
+            :rules="[
+              val => val !== null && val !== '' || 'Por favor digite seu telefone'
+            ]"
+          />
+        </div>
+        <div class="col-3 q-pl-xs q-mb-md">
+          <q-input
+            filled
+            v-model="cep"
+            label="Seu CEP *"
+            lazy-rules
+            :rules="[
+              val => val !== null && val !== '' || 'Por favor digite seu CEP '
+            ]"
+          />
+        </div>
+      </div>
 
       <div>
         <q-btn label="Salvar" type="submit" color="primary"/>
@@ -67,18 +74,16 @@ import { useQuasar } from 'quasar';
 import { ref} from 'vue';
 
 const $q = useQuasar();
-
 const nome = ref(null);
 const sobrenome = ref(null);
 const email = ref(null);
 const telefone = ref(null);
 const cep = ref(null);
 
-
 const onSubmit = async () => {
   try {
     
-    const response = await api.post("/clientes", {
+    await api.post("/clientes", {
       nome: nome.value,
       sobrenome: sobrenome.value,
       email: email.value,
@@ -86,7 +91,6 @@ const onSubmit = async () => {
       cep: cep.value
     });
 
-    console.log(response);
     $q.notify({
       color: 'green-4',
       textColor: 'white',
@@ -109,7 +113,6 @@ const onSubmit = async () => {
     });
   }
 };
-
 
 
 </script>

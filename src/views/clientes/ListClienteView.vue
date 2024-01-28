@@ -1,5 +1,5 @@
 <template>
-    <h1>ClientesView</h1>
+    <h5>Clientes</h5>
     <div>
       <TabelaClientes></TabelaClientes>
     </div>
@@ -8,25 +8,23 @@
   <script>
 import { defineComponent } from 'vue';
 import TabelaClientes from '@/components/TabelaClientes.vue';
+
 const linkList = {
     title: 'Clientes',
     capitions: '',
-    route: {name: 'clientes'}
+    route: {name: 'listCliente'}
 }
 
 export default defineComponent({
-    name: 'HomeView',
+    name: 'ListClienteView',
 
     components: {
         TabelaClientes
     },
 
     setup () {
-
-
         return {
-            tabelasClientes: linkList,
-            
+            tabelasClientes: linkList
         }
     }
 })

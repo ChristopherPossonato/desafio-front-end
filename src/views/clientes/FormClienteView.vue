@@ -1,5 +1,5 @@
 <template>
-   <h1>Cadastrar Novo Cliente</h1>
+   <h5>Cadastrar Novo Cliente</h5>
     <q-layout>
         
         <q-page-container>
@@ -15,12 +15,11 @@ import FormularioCliente from '@/components/FormularioCliente.vue';
 const linkList = {
     title: 'Home',
     capitions: '',
-    icon: 'home',
-    route: {name: 'home'}
+    route: {name: 'formCliente'}
 }
 
 export default defineComponent({
-    name: 'HomeView',
+    name: 'FormClienteView',
 
     components: {
         FormularioCliente
