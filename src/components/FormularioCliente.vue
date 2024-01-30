@@ -1,8 +1,8 @@
 <template>
   <div class="q-pa-md">
+    
     <q-form
-      @submit="onSubmit"
-    >
+      @submit="onSubmit">
       <div class="row">
         <div class="col-6 q-mb-md">
           <q-input
@@ -71,7 +71,8 @@
 <script setup>
 import { api } from '@/boot/axios';
 import { useQuasar } from 'quasar';
-import { ref} from 'vue';
+import {  ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const nome = ref(null);
@@ -79,11 +80,42 @@ const sobrenome = ref(null);
 const email = ref(null);
 const telefone = ref(null);
 const cep = ref(null);
+const route = useRoute();
+const router = useRouter();
+const clientId = ref('');
+
+
+const buscarCliente = async (clientId) => {
+  try {
+    const response = await api.get(`/clientes/${clientId.value}`);
+    const dadosCliente = response.data;
+    
+      nome.value =  dadosCliente.nome,
+      sobrenome.value = dadosCliente.sobrenome,
+      email.value = dadosCliente.email,
+      telefone.value = dadosCliente.telefone,
+      cep.value = dadosCliente.endereco.cep.replace("-", "")
+
+    
+  } catch (error) {
+    console.error('Erro ao buscar cliente:', error);
+  }
+};
+
+
 
 const onSubmit = async () => {
-  try {
+  if (clientId.value != null) {
+    await editarCliente();
     
-    await api.post("/clientes", {
+  } else {
+    await criarCliente();
+  }
+};
+
+const editarCliente = async () => {
+  try {
+    await api.put(`/clientes/${clientId.value}`, {
       nome: nome.value,
       sobrenome: sobrenome.value,
       email: email.value,
@@ -91,28 +123,69 @@ const onSubmit = async () => {
       cep: cep.value
     });
 
-    $q.notify({
-      color: 'green-4',
-      textColor: 'white',
-      icon: 'cloud_done',
-      message: 'Cliente salvo com sucesso'
-    });
-
-    nome.value = '';
-    sobrenome.value = '';
-    email.value = '';
-    telefone.value = '';
-    cep.value = '';
-
+    notificarSucesso('Cliente editado com sucesso');
+    limparCampos();
+    setTimeout(() => {
+      router.push('/clientes/list');
+    }, 1000);
   } catch (error) {
-    $q.notify({
-      color: 'red-5',
-      textColor: 'white',
-      icon: 'warning',
-      message: 'Erro ao salvar cliente'
-    });
+    notificarErro('Erro ao editar cliente');
   }
 };
+
+const criarCliente = async () => {
+  try {
+    await api.post(`/clientes`, {
+      nome: nome.value,
+      sobrenome: sobrenome.value,
+      email: email.value,
+      telefone: telefone.value,
+      cep: cep.value
+    });
+
+    notificarSucesso('Cliente criado com sucesso');
+    limparCampos();
+   
+
+  } catch (error) {
+    notificarErro('Erro ao criar cliente');
+  }
+};
+
+const notificarSucesso = (mensagem) => {
+  $q.notify({
+    color: 'green-4',
+    textColor: 'white',
+    icon: 'cloud_done',
+    message: mensagem
+  });
+};
+
+const notificarErro = (mensagem) => {
+  $q.notify({
+    color: 'red-5',
+    textColor: 'white',
+    icon: 'warning',
+    message: mensagem
+  });
+};
+
+const limparCampos = () => {
+  nome.value = '';
+  sobrenome.value = '';
+  email.value = '';
+  telefone.value = '';
+  cep.value = '';
+};
+
+
+
+onMounted(() => {
+  
+  clientId.value = route.params.id;
+  clientId.value !== undefined && clientId.value !== null && clientId.value !== '' && buscarCliente(clientId);
+});
+
 
 
 </script>

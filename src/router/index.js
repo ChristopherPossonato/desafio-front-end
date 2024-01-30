@@ -6,6 +6,7 @@ import FormClienteView from '../views/clientes/FormClienteView.vue'
 
 const routes = [
   {
+  
     path: '/clientes/list',
     name: 'listCliente',
     component: ListClienteView
@@ -14,6 +15,11 @@ const routes = [
     path: '/clientes/form',
     name: 'formClient',
     component: FormClienteView
+  },
+  {
+    path: '/clientes/form/:id',
+    name: 'formClientId',
+    component: FormClienteView
   }
 ]
 
@@ -21,5 +27,6 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
 
 export default router

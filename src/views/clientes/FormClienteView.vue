@@ -13,7 +13,7 @@ import { defineComponent } from 'vue';
 import FormularioCliente from '@/components/FormularioCliente.vue';
 
 const linkList = {
-    title: 'Home',
+    title: 'Formulario',
     capitions: '',
     route: {name: 'formCliente'}
 }

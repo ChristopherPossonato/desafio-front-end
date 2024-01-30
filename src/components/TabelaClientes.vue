@@ -26,10 +26,10 @@
           </q-td>
 
           <q-td auto-width>
-            <router-link :to="{ path: '/clientes/form' }"
-          >
-              <q-btn @click="editarCliente(props)" icon="edit" class="q-mr-xs" /> 
+            <router-link :to="editarCliente(props.row) "  >
+              <q-btn   icon="edit" class="q-mr-xs" /> 
             </router-link>
+           
             <q-btn @click="excluirCliente(props)"  icon="delete" class="q-mr-xs" />
             <q-btn @click="exibirMaisInformacoes(props)"  icon="info" />
           </q-td>
@@ -45,6 +45,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import { api } from '../boot/axios';
+
 import DialogDetalhesCliente from './DialogDetalhesCliente.vue';
 import DialogConfirmDelete from './DialogConfirmDelete.vue';
 
@@ -61,21 +62,12 @@ const search = ref('');
 const visibleColumns = ref(['nome', 'email', 'telefone', 'cep', 'sobrenome']);
 const showDetalhes = ref(false);
 const showConfirm = ref(false);
-const clienteSelecionado = ref(null);
-let idCliente;
+const clienteSelecionado = ref('');
+var idCliente;
 
-
-const editarCliente = async (cliente) => {
-  const idCliente = cliente.row.id
+const editarCliente = (idCliente) => {
   
-  try {
-    const response = await api.get("/clientes/" + idCliente)
-    
-    console.log(response.data);
-  } catch (error) {
-    console.log(error);
-  }
-  
+   return (`/clientes/form/${idCliente.id}`)
 };
 
 const getClientes = async () => {
@@ -146,4 +138,6 @@ onMounted(() => {
 watch(search, () => {
   buscarCliente();
 });
+
+
 </script>
